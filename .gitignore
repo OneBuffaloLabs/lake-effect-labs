@@ -1,0 +1,11 @@
+# OpenSCAD Backup Files
+*~
+*.bak
+
+# Slicer Output (Never commit G-code, it's specific to your printer!)
+*.gcode
+
+# OS Hidden Files
+.DS_Store
+Thumbs.db
+desktop.ini
