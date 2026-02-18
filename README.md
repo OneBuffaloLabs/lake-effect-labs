@@ -40,9 +40,8 @@ To keep the root directory clean as the collection grows, all models are sorted 
 Inside a typical project folder (e.g., `/projects/decor/snapfit-logos/bills/`), you'll find:
 
 - `model_name.scad` — The original, customizable OpenSCAD file.
-- `model_name.stl` — The standard exported 3D mesh (often broken into parts for multi-color printing).
-- `svgs/` — The raw vector files used by OpenSCAD to generate the geometry.
-- `images/` — Renders and photos of the final printed object.
+- `model_name-part.stl` — The exported 3D meshes (often broken into parts like `base` and `insert` for multi-color printing).
+- `images/` — Renders, photos of the final printed object, and the raw `.svg` vector files used by OpenSCAD to generate the geometry.
 - `README.md` — Specific print settings, clearances, and assembly guides for that exact model.
 
 ## Remixes & Community
