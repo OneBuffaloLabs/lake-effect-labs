@@ -35,12 +35,15 @@ To keep the root directory clean as the collection grows, all models are sorted 
 - `/projects/printer-mods/` — Upgrades and tweaks for hardware like the Creality K2 SE.
 - `/projects/toys/` — Fun prints, props, and fidgets.
 
-Inside a typical project folder (e.g., `/projects/decor/buffalo-bills-logo/`), you'll find:
+**📁 Note on Collections:** For large series of related models (like my multi-part "SnapFit" sports logos), they are grouped into master sub-folders to keep the main directories from getting cluttered.
+
+Inside a typical project folder (e.g., `/projects/decor/snapfit-logos/bills/`), you'll find:
 
 - `model_name.scad` — The original, customizable OpenSCAD file.
-- `model_name.stl` — The standard exported 3D mesh.
+- `model_name.stl` — The standard exported 3D mesh (often broken into parts for multi-color printing).
+- `svgs/` — The raw vector files used by OpenSCAD to generate the geometry.
 - `images/` — Renders and photos of the final printed object.
-- `README.md` — Specific print settings, required hardware, and assembly guides for that exact model.
+- `README.md` — Specific print settings, clearances, and assembly guides for that exact model.
 
 ## Remixes & Community
 
