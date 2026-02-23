@@ -1,7 +1,7 @@
 /* JASON VOORHEES POKÉBALL */
 
 // --- PARAMETRIC VARIABLES ---
-part_to_render = "all"; // [all, top, bottom, ring, front_ring, button, filler, chips_black, chips_red]
+part_to_render = "all"; // [all, top, bottom, ring, front_ring, button, filler, chips_black, chips_red, chips_silver]
 exploded_view = false;
 debug_transparent_chips = false; // TRUE = Glass chips so you can see the holes!
 
@@ -36,15 +36,18 @@ ring_color = "silver";
 front_ring_color = "silver";
 button_color = "red";
 filler_color = "black";
+crack_color = "silver";
 
 // --- RENDER LOGIC ---
 
 // Helper colors for the transparent debugger!
 c_black = debug_transparent_chips ? [0, 0, 0, 0.5] : "black";
 c_red = debug_transparent_chips ? [1, 0, 0, 0.5] : "red";
+c_silver = debug_transparent_chips ? [0.75, 0.75, 0.75, 0.5] : crack_color;
 
 if (part_to_render == "chips_black") { color("black") layout_chips_black(); }
 if (part_to_render == "chips_red") { color("red") layout_chips_red(); }
+if (part_to_render == "chips_silver") { color(crack_color) layout_chips_silver(); }
 
 if (part_to_render == "all") {
   if (exploded_view == true) {
@@ -60,6 +63,7 @@ if (part_to_render == "all") {
       color(c_black) draw_eyes(is_pocket=false, hover=15);
       color(c_black) draw_top_holes(is_pocket=false, hover=15);
       color(c_red) draw_top_chevrons(is_pocket=false, hover=15);
+      color(c_silver) draw_top_crack(is_pocket=false, hover=15);
     }
     translate([0, 0, -35]) {
       color(c_red) draw_bottom_chevrons(is_pocket=false, hover=15);
@@ -77,12 +81,13 @@ if (part_to_render == "all") {
       color(c_black) draw_eyes(is_pocket=false, hover=0);
       color(c_black) draw_top_holes(is_pocket=false, hover=0);
       color(c_red) draw_top_chevrons(is_pocket=false, hover=0);
+      color(c_silver) draw_top_crack(is_pocket=false, hover=0);
     }
     translate([0, 0, -0.02]) {
       color(c_red) draw_bottom_chevrons(is_pocket=false, hover=0);
     }
   }
-} else if (part_to_render != "chips_black" && part_to_render != "chips_red") {
+} else if (part_to_render != "chips_black" && part_to_render != "chips_red" && part_to_render != "chips_silver") {
   // --- EXPORT MODE ---
   if (part_to_render == "top") color("white") top_mask();
   if (part_to_render == "bottom") color("black") bottom_shell();
@@ -111,6 +116,7 @@ module top_mask() {
     draw_eyes(is_pocket=true);
     draw_top_chevrons(is_pocket=true);
     draw_top_holes(is_pocket=true);
+    draw_top_crack(is_pocket=true);
   }
 }
 
@@ -256,6 +262,30 @@ module draw_top_holes(is_pocket = true, hover = 0) {
   h(25, 70);
 }
 
+module draw_top_crack(is_pocket = true, hover = 0) {
+  clearance = is_pocket ? 0 : chip_clearance;
+  z_off = is_pocket ? -eps : -0.05;
+  h_val = is_pocket ? pocket_depth + eps : pocket_depth;
+
+  place_outward(45, -70, hover)
+    rotate([0, 0, 100])
+      translate([0, 0, z_off])
+        linear_extrude(height=h_val)
+          offset(delta=-clearance)
+            polygon(
+              points=[
+                [-5, 12],
+                [-2, 4],
+                [-4, -2],
+                [-1, -12],
+                [2, -12],
+                [-1, -2],
+                [1, 4],
+                [-2, 12],
+              ]
+            );
+}
+
 // --- PRINTABLE CHIP LAYOUTS ---
 
 module layout_chips_black() {
@@ -272,4 +302,22 @@ module layout_chips_red() {
   translate([0, 15, 0]) scale([1.6, 0.7, 1]) cylinder(r=9.5 - chip_clearance, h=pocket_depth, $fn=3);
   translate([-12, -5, 0]) cylinder(r=5.5 - chip_clearance, h=pocket_depth, $fn=3);
   translate([12, -5, 0]) cylinder(r=5.5 - chip_clearance, h=pocket_depth, $fn=3);
+}
+
+module layout_chips_silver() {
+  translate([30, -15, 0])
+    linear_extrude(height=pocket_depth)
+      offset(delta=-chip_clearance)
+        polygon(
+          points=[
+            [-5, 12],
+            [-2, 4],
+            [-4, -2],
+            [-1, -12],
+            [2, -12],
+            [-1, -2],
+            [1, 4],
+            [-2, 12],
+          ]
+        );
 }

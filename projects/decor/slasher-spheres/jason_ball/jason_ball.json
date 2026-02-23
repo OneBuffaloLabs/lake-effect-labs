@@ -10,7 +10,6 @@
             "chip_clearance": "0.25",
             "debug_transparent_chips": "false",
             "eps": "0.01",
-            "exploded_view": "true",
             "filler_color": "black",
             "filler_height": "18",
             "filler_length": "14",
