@@ -1,0 +1,31 @@
+{
+    "fileFormatVersion": "1",
+    "parameterSets": {
+        "width": {
+            "$fn": "64",
+            "ball_radius": "40",
+            "bottom_color": "black",
+            "button_color": "red",
+            "button_inner_radius": "7",
+            "chip_clearance": "0.25",
+            "debug_transparent_chips": "false",
+            "eps": "0.01",
+            "exploded_view": "true",
+            "filler_color": "black",
+            "filler_height": "18",
+            "filler_length": "14",
+            "filler_width": "24",
+            "front_pocket_depth": "6",
+            "front_ring_color": "silver",
+            "front_ring_depth": "4",
+            "front_ring_inner_r": "9",
+            "front_ring_outer_r": "13",
+            "mechanical_clearance": "0.2",
+            "part_to_render": "all",
+            "pocket_depth": "2.5",
+            "ring_color": "silver",
+            "ring_height": "6",
+            "top_color": "white"
+        }
+    }
+}
