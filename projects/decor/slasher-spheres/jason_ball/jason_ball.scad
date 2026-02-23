@@ -289,19 +289,19 @@ module draw_top_crack(is_pocket = true, hover = 0) {
 // --- PRINTABLE CHIP LAYOUTS ---
 
 module layout_chips_black() {
-  translate([-15, -15, 0]) rotate([0, 0, 25]) scale([1.4, 0.7, 1]) cylinder(r=7.5 - chip_clearance, h=pocket_depth);
-  translate([15, -15, 0]) rotate([0, 0, -25]) scale([1.4, 0.7, 1]) cylinder(r=7.5 - chip_clearance, h=pocket_depth);
+  translate([-15, -15, 0]) rotate([0, 0, 25]) scale([1.3, 1, 1]) cylinder(r=6 - chip_clearance, h=pocket_depth);
+  translate([15, -15, 0]) rotate([0, 0, -25]) scale([1.3, 1, 1]) cylinder(r=6 - chip_clearance, h=pocket_depth);
 
-  for (i = [0:7]) {
-    translate([-20 + (i % 4) * 12, 10 + floor(i / 4) * 12, 0])
+  for (i = [0:13]) {
+    translate([-20 + (i % 7) * 8, 10 + floor(i / 7) * 12, 0])
       cylinder(r=2.5 - chip_clearance, h=pocket_depth);
   }
 }
 
 module layout_chips_red() {
-  translate([0, 15, 0]) scale([1.6, 0.7, 1]) cylinder(r=9.5 - chip_clearance, h=pocket_depth, $fn=3);
-  translate([-12, -5, 0]) cylinder(r=5.5 - chip_clearance, h=pocket_depth, $fn=3);
-  translate([12, -5, 0]) cylinder(r=5.5 - chip_clearance, h=pocket_depth, $fn=3);
+  translate([0, 15, 0]) scale([.8, 2, 1]) cylinder(r=7.5 - chip_clearance, h=pocket_depth, $fn=3);
+  translate([-12, -5, 0]) scale([2, .5, 1]) cylinder(r=5.5 - chip_clearance, h=pocket_depth, $fn=3);
+  translate([12, -5, 0]) scale([2, .5, 1]) cylinder(r=5.5 - chip_clearance, h=pocket_depth, $fn=3);
 }
 
 module layout_chips_silver() {
