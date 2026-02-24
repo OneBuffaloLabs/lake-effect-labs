@@ -25,9 +25,12 @@ mechanical_clearance = 0.2;
 chip_clearance = 0.25;
 pocket_depth = 2.5;
 
+// --- GHOSTFACE LOGO SCALE ---
+mask_scale = 0.06; // Scaled to ~43x68mm. Perfect size for the top dome.
+
 // --- MANIFOLD GEOMETRY & RESOLUTION ---
 eps = 0.01;
-$fn = 64;
+$fn = 120; // High res for smooth curves
 
 // --- Colors ---
 top_color = "white";
@@ -54,7 +57,7 @@ if (part_to_render == "all") {
     translate([0, 0, 15]) color(filler_color) alignment_filler();
 
     translate([0, 0, 35]) {
-      color(c_black) draw_ghostface_mask(is_pocket=false, hover=15);
+      color(c_black) draw_ghostface_chip(hover=15);
     }
   } else {
     // --- NORMAL ASSEMBLED VIEW ---
@@ -66,7 +69,7 @@ if (part_to_render == "all") {
     color(filler_color) alignment_filler();
 
     translate([0, 0, 0.02]) {
-      color(c_black) draw_ghostface_mask(is_pocket=false, hover=0);
+      color(c_black) draw_ghostface_chip(hover=0);
     }
   }
 } else if (part_to_render != "chips_black") {
@@ -94,13 +97,12 @@ module top_mask() {
       rotate([90, 0, 0])
         cylinder(r=front_ring_outer_r + mechanical_clearance, h=front_pocket_depth + eps * 2, center=false);
 
-    draw_ghostface_mask(is_pocket=true);
+    // Subtract the curved pocket!
+    pocket_volume(hover = 0);
   }
 }
 
 module bottom_shell() {
-  // Note: For the "dripping" effect from your reference image, paint/post-processing 
-  // is recommended rather than geometry cuts to maintain the ring hardware structure!
   difference() {
     sphere(r=ball_radius);
 
@@ -152,59 +154,77 @@ module center_button() {
 
         // Tiny Ghostface Cutout on the red button!
         translate([0, 0, front_ring_depth / 2 + 1])
-          linear_extrude(height=5)
-            import_ghostface_svg(0, 0.007);
-        // Super tiny scale
+          rotate([0, 0, 180]) // Upright orientation
+            linear_extrude(height=5)
+              import_ghostface_svg(0, 0.007);
       }
 }
 
-// --- FEATURE PLACEMENT ENGINE ---
+// --- CURVED PROJECTION ENGINE ---
 
-module place_outward(tilt, pan, hover = 0) {
-  rotate([0, 0, pan])
-    rotate([-tilt, 0, 0])
-      translate([0, -(ball_radius + hover), 0])
-        rotate([-90, 0, 0])
-          children();
-}
-
-// Standardized SVG importer that centers and flips coordinates
-module import_ghostface_svg(clearance, scale_factor) {
-  offset(delta=-clearance)
-    scale([scale_factor, scale_factor, 1])
-      translate([-361.17, -566.11, 0])
-        mirror([0, 1, 0]) // Flip Y to match OpenSCAD coordinates
+// Standardized SVG importer.
+// Uses positive expansion for pockets to avoid breaking the 2D polygon.
+module import_ghostface_svg(expand, scale_factor) {
+  if (expand > 0) {
+    offset(delta=expand, chamfer=true)
+      scale([scale_factor, scale_factor])
+        mirror([0, 1]) // Flips Y AFTER it is centered
+          translate([-361.17, -566.11]) // Center perfectly on the origin
+            import("images/ghostface.svg");
+  } else {
+    scale([scale_factor, scale_factor])
+      mirror([0, 1])
+        translate([-361.17, -566.11])
           import("images/ghostface.svg");
+  }
 }
 
-module draw_ghostface_mask(is_pocket = true, hover = 0) {
-  clearance = is_pocket ? 0 : chip_clearance;
-  z_off = is_pocket ? -eps : -0.05;
-  h_val = is_pocket ? pocket_depth + 10 : pocket_depth + 10;
+// Generates a deep 3D cylinder/cone from the mask shape
+module mask_cutter(expand) {
+  rotate([90, 0, 0])
+    translate([0, 0, -10]) // Starts slightly behind the core
+      linear_extrude(height=ball_radius + 20) // Pierces completely through the front
+        import_ghostface_svg(expand, mask_scale);
+}
 
-  intersection() {
-    place_outward(35, 0, hover)
-      translate([0, 0, z_off])
-        linear_extrude(height=h_val)
-          import_ghostface_svg(clearance, 0.048);
+// Intersects the cutter with a spherical shell to create a curved pocket volume
+module pocket_volume(hover = 0) {
+  rotate([0, 0, 0]) // Pan
+    rotate([-35, 0, 0]) // Tilt 35 degrees up
+      intersection() {
+        mask_cutter(chip_clearance); // Pocket gets the mechanical clearance!
+        difference() {
+          sphere(r = ball_radius + hover + eps);
+          sphere(r = ball_radius + hover - pocket_depth);
+        }
+      }
+}
 
-    // If it's a chip, give it the curved outer roof of the Pokéball
-    if (!is_pocket) {
-      sphere(r=ball_radius + 0.05);
-    }
-  }
+// Intersects the cutter with a shell to create the positive physical chip
+module draw_ghostface_chip(hover = 0) {
+  rotate([0, 0, 0]) // Pan
+    rotate([-35, 0, 0]) // Tilt 35 degrees up
+      intersection() {
+        mask_cutter(0); // Chip is true-to-size
+        difference() {
+          sphere(r = ball_radius + hover);
+          sphere(r = ball_radius + hover - pocket_depth);
+        }
+      }
 }
 
 // --- PRINTABLE CHIP LAYOUTS ---
 
 module layout_chips_black() {
-  // We extrude the flat SVG on the print bed, but intersect it with a
-  // sphere hovering just above it to create a perfectly curved roof!
-  intersection() {
-    linear_extrude(height=pocket_depth + 10)
-      import_ghostface_svg(chip_clearance, 0.048);
-
-    translate([0, 0, pocket_depth - ball_radius])
-      sphere(r=ball_radius + 0.05);
-  }
+  // To print a curved shell, we orient the outer face pointing straight up (+Z)
+  // and drop the lowest inner point exactly onto the print bed (Z=0).
+  translate([0, 0, -(ball_radius - pocket_depth)])
+    rotate([-90, 0, 0]) // Points the face UP
+      intersection() {
+        mask_cutter(0);
+        difference() {
+          sphere(r = ball_radius);
+          sphere(r = ball_radius - pocket_depth);
+        }
+      }
 }
