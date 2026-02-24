@@ -21,8 +21,8 @@ button_inner_radius = 7;
 front_pocket_depth = 6;
 
 // --- TOLERANCES & CLEARANCES ---
-mechanical_clearance = 0.2;
-chip_clearance = 0.25;
+mechanical_clearance = 0.05;
+chip_clearance = 0.05;
 pocket_depth = 2.5;
 
 // --- MANIFOLD GEOMETRY & RESOLUTION ---
@@ -126,6 +126,10 @@ module bottom_shell() {
 
     // Massive block to strictly cut everything above Z=-3, killing ghost lines
     translate([0, 0, 47])
+      cube([150, 150, 100], center=true);
+
+    // Massive block to cut a 3mm flat resting plane on the bottom of the ball
+    translate([0, 0, -87])
       cube([150, 150, 100], center=true);
 
     cube([filler_width + mechanical_clearance, filler_length + mechanical_clearance, filler_height + mechanical_clearance], center=true);
