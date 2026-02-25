@@ -23,7 +23,9 @@ front_pocket_depth = 6;
 // --- TOLERANCES & CLEARANCES ---
 mechanical_clearance = 0.05;
 chip_clearance = 0.05;
+button_clearance = 0.0;
 pocket_depth = 2.5;
+accent_pocket_extra_depth = 0.5; // Sinks holes deeper so chips can sit flush
 
 // --- MANIFOLD GEOMETRY & RESOLUTION ---
 eps = 0.01;
@@ -163,7 +165,7 @@ module front_ring() {
     rotate([90, 0, 0])
       difference() {
         cylinder(r=front_ring_outer_r - mechanical_clearance, h=front_ring_depth, center=true);
-        cylinder(r=front_ring_inner_r + mechanical_clearance, h=front_ring_depth + eps * 2, center=true);
+        cylinder(r=front_ring_inner_r + button_clearance, h=front_ring_depth + eps * 2, center=true);
       }
 }
 
@@ -171,7 +173,7 @@ module center_button() {
   translate([0, -(ball_radius - (front_ring_depth / 2)), 0])
     rotate([90, 0, 0])
       union() {
-        cylinder(r=front_ring_inner_r - mechanical_clearance, h=front_ring_depth, center=true);
+        cylinder(r=front_ring_inner_r - button_clearance, h=front_ring_depth, center=true);
         translate([0, 0, front_ring_depth / 2])
           cylinder(r=button_inner_radius, h=2, center=false);
       }
@@ -203,8 +205,10 @@ module draw_eyes(is_pocket = true, hover = 0) {
 
 module draw_top_chevrons(is_pocket = true, hover = 0) {
   r_big = is_pocket ? 7.5 : 7.5 - chip_clearance;
-  z_off = is_pocket ? -eps : -0.05;
-  h_val = is_pocket ? pocket_depth + eps : pocket_depth;
+  // Moves chip inward for preview so it looks flush
+  z_off = is_pocket ? -eps : -0.05 + accent_pocket_extra_depth;
+  // Sinks pocket deeper for real print
+  h_val = is_pocket ? pocket_depth + accent_pocket_extra_depth + eps : pocket_depth;
 
   place_outward(37, 0, hover)
     rotate([0, 0, 90])
@@ -215,8 +219,10 @@ module draw_top_chevrons(is_pocket = true, hover = 0) {
 
 module draw_bottom_chevrons(is_pocket = true, hover = 0) {
   r_small = is_pocket ? 5.5 : 5.5 - chip_clearance;
-  z_off = is_pocket ? -eps : -0.05;
-  h_val = is_pocket ? pocket_depth + eps : pocket_depth;
+  // Moves chip inward for preview so it looks flush
+  z_off = is_pocket ? -eps : -0.05 + accent_pocket_extra_depth;
+  // Sinks pocket deeper for real print
+  h_val = is_pocket ? pocket_depth + accent_pocket_extra_depth + eps : pocket_depth;
 
   place_outward(-25, 42, hover)
     rotate([0, 0, 225])
@@ -268,8 +274,10 @@ module draw_top_holes(is_pocket = true, hover = 0) {
 
 module draw_top_crack(is_pocket = true, hover = 0) {
   clearance = is_pocket ? 0 : chip_clearance;
-  z_off = is_pocket ? -eps : -0.05;
-  h_val = is_pocket ? pocket_depth + eps : pocket_depth;
+  // Moves chip inward for preview so it looks flush
+  z_off = is_pocket ? -eps : -0.05 + accent_pocket_extra_depth;
+  // Sinks pocket deeper for real print
+  h_val = is_pocket ? pocket_depth + accent_pocket_extra_depth + eps : pocket_depth;
 
   place_outward(45, -70, hover)
     rotate([0, 0, 100])
