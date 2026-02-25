@@ -26,6 +26,8 @@ chip_clearance = 0.05;
 button_clearance = 0.0;
 pocket_depth = 2.5;
 accent_pocket_extra_depth = 0.5; // Sinks holes deeper so chips can sit flush
+filler_xy_clearance = 0.1;
+filler_z_clearance = 0.5;
 
 // --- MANIFOLD GEOMETRY & RESOLUTION ---
 eps = 0.01;
@@ -109,7 +111,7 @@ module top_mask() {
     translate([0, 0, -47])
       cube([150, 150, 100], center=true);
 
-    cube([filler_width + mechanical_clearance, filler_length + mechanical_clearance, filler_height + mechanical_clearance], center=true);
+    cube([filler_width + filler_xy_clearance, filler_length + filler_xy_clearance, filler_height + filler_z_clearance], center=true);
 
     translate([0, -ball_radius + front_pocket_depth, 0])
       rotate([90, 0, 0])
@@ -134,7 +136,7 @@ module bottom_shell() {
     translate([0, 0, -87])
       cube([150, 150, 100], center=true);
 
-    cube([filler_width + mechanical_clearance, filler_length + mechanical_clearance, filler_height + mechanical_clearance], center=true);
+    cube([filler_width + filler_xy_clearance, filler_length + filler_xy_clearance, filler_height + filler_z_clearance], center=true);
 
     translate([0, -ball_radius + front_pocket_depth, 0])
       rotate([90, 0, 0])
@@ -148,7 +150,7 @@ module center_ring() {
   difference() {
     cylinder(r=ball_radius - 0.5, h=ring_height, center=true);
 
-    cube([filler_width + mechanical_clearance, filler_length + mechanical_clearance, ring_height + eps * 2], center=true);
+    cube([filler_width + filler_xy_clearance, filler_length + filler_xy_clearance, ring_height + eps * 2], center=true);
 
     translate([0, -ball_radius + front_pocket_depth, 0])
       rotate([90, 0, 0])
@@ -164,7 +166,7 @@ module front_ring() {
   translate([0, -(ball_radius - (front_ring_depth / 2)), 0])
     rotate([90, 0, 0])
       difference() {
-        cylinder(r=front_ring_outer_r - mechanical_clearance, h=front_ring_depth, center=true);
+        cylinder(r=front_ring_outer_r - button_clearance, h=front_ring_depth, center=true);
         cylinder(r=front_ring_inner_r + button_clearance, h=front_ring_depth + eps * 2, center=true);
       }
 }
