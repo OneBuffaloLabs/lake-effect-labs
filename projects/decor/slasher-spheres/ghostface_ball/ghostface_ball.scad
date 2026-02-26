@@ -21,16 +21,19 @@ button_inner_radius = 7;
 front_pocket_depth = 6;
 
 // --- TOLERANCES & CLEARANCES ---
-mechanical_clearance = 0.2;
-chip_clearance = 0.25;
+mechanical_clearance = 0.05; // Tightened for high-precision printing
+chip_clearance = 0.05;       // Tightened for high-precision printing
+button_clearance = 0.0;      // Snug friction fit for gluing
 pocket_depth = 2.5;
+filler_xy_clearance = 0.1;   // Slides in easily by hand
+filler_z_clearance = 0.5;    // Prevents block from bottoming out
 
 // --- GHOSTFACE LOGO SCALE ---
 mask_scale = 0.06; // Scaled to ~43x68mm. Perfect size for the top dome.
 
 // --- MANIFOLD GEOMETRY & RESOLUTION ---
 eps = 0.01;
-$fn = $preview ? 32 : 120;
+$fn = $preview ? 32 : 120; // Fast preview, high-res export
 
 // --- Colors ---
 top_color = "white";
@@ -88,10 +91,12 @@ module top_mask() {
   difference() {
     sphere(r=ball_radius);
 
+    // Massive block to strictly cut everything below Z=3, killing ghost lines
     translate([0, 0, -47])
       cube([150, 150, 100], center=true);
 
-    cube([filler_width + mechanical_clearance, filler_length + mechanical_clearance, filler_height + mechanical_clearance], center=true);
+    // Uses specific filler clearances
+    cube([filler_width + filler_xy_clearance, filler_length + filler_xy_clearance, filler_height + filler_z_clearance], center=true);
 
     translate([0, -ball_radius + front_pocket_depth, 0])
       rotate([90, 0, 0])
@@ -106,10 +111,16 @@ module bottom_shell() {
   difference() {
     sphere(r=ball_radius);
 
+    // Massive block to strictly cut everything above Z=-3, killing ghost lines
     translate([0, 0, 47])
       cube([150, 150, 100], center=true);
 
-    cube([filler_width + mechanical_clearance, filler_length + mechanical_clearance, filler_height + mechanical_clearance], center=true);
+    // Massive block to cut a 3mm flat resting plane on the bottom of the ball
+    translate([0, 0, -87])
+      cube([150, 150, 100], center=true);
+
+    // Uses specific filler clearances
+    cube([filler_width + filler_xy_clearance, filler_length + filler_xy_clearance, filler_height + filler_z_clearance], center=true);
 
     translate([0, -ball_radius + front_pocket_depth, 0])
       rotate([90, 0, 0])
@@ -121,7 +132,8 @@ module center_ring() {
   difference() {
     cylinder(r=ball_radius - 0.5, h=ring_height, center=true);
 
-    cube([filler_width + mechanical_clearance, filler_length + mechanical_clearance, ring_height + eps * 2], center=true);
+    // Uses specific filler clearances
+    cube([filler_width + filler_xy_clearance, filler_length + filler_xy_clearance, ring_height + eps * 2], center=true);
 
     translate([0, -ball_radius + front_pocket_depth, 0])
       rotate([90, 0, 0])
@@ -137,8 +149,9 @@ module front_ring() {
   translate([0, -(ball_radius - (front_ring_depth / 2)), 0])
     rotate([90, 0, 0])
       difference() {
-        cylinder(r=front_ring_outer_r - mechanical_clearance, h=front_ring_depth, center=true);
-        cylinder(r=front_ring_inner_r + mechanical_clearance, h=front_ring_depth + eps * 2, center=true);
+        // Uses button_clearance for snug button fit
+        cylinder(r=front_ring_outer_r - button_clearance, h=front_ring_depth, center=true);
+        cylinder(r=front_ring_inner_r + button_clearance, h=front_ring_depth + eps * 2, center=true);
       }
 }
 
@@ -147,7 +160,8 @@ module center_button() {
     rotate([90, 0, 0])
       difference() {
         union() {
-          cylinder(r=front_ring_inner_r - mechanical_clearance, h=front_ring_depth, center=true);
+          // Uses button_clearance for snug fit
+          cylinder(r=front_ring_inner_r - button_clearance, h=front_ring_depth, center=true);
           translate([0, 0, front_ring_depth / 2])
             cylinder(r=button_inner_radius, h=2, center=false);
         }
@@ -192,7 +206,8 @@ module pocket_volume(hover = 0) {
   rotate([0, 0, 0]) // Pan
     rotate([-35, 0, 0]) // Tilt 35 degrees up
       intersection() {
-        mask_cutter(chip_clearance); // Pocket gets the mechanical clearance!
+        mask_cutter(chip_clearance);
+        // Pocket gets the mechanical clearance!
         difference() {
           sphere(r=ball_radius + hover + eps);
           sphere(r=ball_radius + hover - pocket_depth);
@@ -205,7 +220,8 @@ module draw_ghostface_chip(hover = 0) {
   rotate([0, 0, 0]) // Pan
     rotate([-35, 0, 0]) // Tilt 35 degrees up
       intersection() {
-        mask_cutter(0); // Chip is true-to-size
+        mask_cutter(0);
+        // Chip is true-to-size
         difference() {
           sphere(r=ball_radius + hover);
           sphere(r=ball_radius + hover - pocket_depth);
