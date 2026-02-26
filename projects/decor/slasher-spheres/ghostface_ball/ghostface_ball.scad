@@ -21,25 +21,22 @@ button_inner_radius = 7;
 front_pocket_depth = 6;
 
 // --- TOLERANCES & CLEARANCES ---
-mechanical_clearance = 0.05; // Tightened for high-precision printing
-chip_clearance = 0.05;       // Tightened for high-precision printing
-button_clearance = 0.0;      // Snug friction fit for gluing
+mechanical_clearance = 0.05;
+chip_clearance = 0.05;
+button_clearance = 0.0;
 pocket_depth = 2.5;
-filler_xy_clearance = 0.1;   // Slides in easily by hand
-filler_z_clearance = 0.5;    // Prevents block from bottoming out
-
-// --- GHOSTFACE LOGO SCALE ---
-mask_scale = 0.06; // Scaled to ~43x68mm. Perfect size for the top dome.
+filler_xy_clearance = 0.1;
+filler_z_clearance = 0.5;
 
 // --- MANIFOLD GEOMETRY & RESOLUTION ---
 eps = 0.01;
-$fn = $preview ? 32 : 120; // Fast preview, high-res export
+$fn = $preview ? 32 : 120;
 
 // --- Colors ---
 top_color = "white";
 bottom_color = "black";
-ring_color = "silver";
-front_ring_color = "silver";
+ring_color = "black";
+front_ring_color = "black";
 button_color = "red";
 filler_color = "black";
 
@@ -60,7 +57,7 @@ if (part_to_render == "all") {
     translate([0, 0, 15]) color(filler_color) alignment_filler();
 
     translate([0, 0, 35]) {
-      color(c_black) draw_ghostface_chip(hover=15);
+      color(c_black) draw_right_eye(is_pocket=false, hover=15);
     }
   } else {
     // --- NORMAL ASSEMBLED VIEW ---
@@ -72,7 +69,7 @@ if (part_to_render == "all") {
     color(filler_color) alignment_filler();
 
     translate([0, 0, 0.02]) {
-      color(c_black) draw_ghostface_chip(hover=0);
+      color(c_black) draw_right_eye(is_pocket=false, hover=0);
     }
   }
 } else if (part_to_render != "chips_black") {
@@ -95,15 +92,14 @@ module top_mask() {
     translate([0, 0, -47])
       cube([150, 150, 100], center=true);
 
-    // Uses specific filler clearances
     cube([filler_width + filler_xy_clearance, filler_length + filler_xy_clearance, filler_height + filler_z_clearance], center=true);
 
     translate([0, -ball_radius + front_pocket_depth, 0])
       rotate([90, 0, 0])
         cylinder(r=front_ring_outer_r + mechanical_clearance, h=front_pocket_depth + eps * 2, center=false);
 
-    // Subtract the curved pocket!
-    pocket_volume(hover=0);
+    // Cut the right eye pocket!
+    draw_right_eye(is_pocket=true);
   }
 }
 
@@ -111,15 +107,12 @@ module bottom_shell() {
   difference() {
     sphere(r=ball_radius);
 
-    // Massive block to strictly cut everything above Z=-3, killing ghost lines
     translate([0, 0, 47])
       cube([150, 150, 100], center=true);
 
-    // Massive block to cut a 3mm flat resting plane on the bottom of the ball
     translate([0, 0, -87])
       cube([150, 150, 100], center=true);
 
-    // Uses specific filler clearances
     cube([filler_width + filler_xy_clearance, filler_length + filler_xy_clearance, filler_height + filler_z_clearance], center=true);
 
     translate([0, -ball_radius + front_pocket_depth, 0])
@@ -132,7 +125,6 @@ module center_ring() {
   difference() {
     cylinder(r=ball_radius - 0.5, h=ring_height, center=true);
 
-    // Uses specific filler clearances
     cube([filler_width + filler_xy_clearance, filler_length + filler_xy_clearance, ring_height + eps * 2], center=true);
 
     translate([0, -ball_radius + front_pocket_depth, 0])
@@ -149,7 +141,6 @@ module front_ring() {
   translate([0, -(ball_radius - (front_ring_depth / 2)), 0])
     rotate([90, 0, 0])
       difference() {
-        // Uses button_clearance for snug button fit
         cylinder(r=front_ring_outer_r - button_clearance, h=front_ring_depth, center=true);
         cylinder(r=front_ring_inner_r + button_clearance, h=front_ring_depth + eps * 2, center=true);
       }
@@ -158,89 +149,63 @@ module front_ring() {
 module center_button() {
   translate([0, -(ball_radius - (front_ring_depth / 2)), 0])
     rotate([90, 0, 0])
-      difference() {
-        union() {
-          // Uses button_clearance for snug fit
-          cylinder(r=front_ring_inner_r - button_clearance, h=front_ring_depth, center=true);
-          translate([0, 0, front_ring_depth / 2])
-            cylinder(r=button_inner_radius, h=2, center=false);
-        }
-
-        // Tiny Ghostface Cutout on the red button!
-        translate([0, 0, front_ring_depth / 2 + 1])
-          rotate([0, 0, 180]) // Upright orientation
-            linear_extrude(height=5)
-              import_ghostface_svg(0, 0.007);
+      union() {
+        cylinder(r=front_ring_inner_r - button_clearance, h=front_ring_depth, center=true);
+        translate([0, 0, front_ring_depth / 2])
+          cylinder(r=button_inner_radius, h=2, center=false);
       }
 }
 
-// --- CURVED PROJECTION ENGINE ---
+// --- FEATURE PLACEMENT ENGINE ---
 
-// Standardized SVG importer.
-// Uses positive expansion for pockets to avoid breaking the 2D polygon.
-module import_ghostface_svg(expand, scale_factor) {
-  if (expand > 0) {
-    offset(delta=expand, chamfer=true)
-      scale([scale_factor, scale_factor])
-        mirror([0, 1]) // Flips Y AFTER it is centered
-          translate([-361.17, -566.11]) // Center perfectly on the origin
-            import("images/ghostface.svg");
-  } else {
-    scale([scale_factor, scale_factor])
-      mirror([0, 1])
-        translate([-361.17, -566.11])
-          import("images/ghostface.svg");
+module place_outward(tilt, pan, hover = 0) {
+  rotate([0, 0, pan])
+    rotate([-tilt, 0, 0])
+      translate([0, -(ball_radius + hover), 0])
+        rotate([-90, 0, 0])
+          children();
+}
+
+// Loads the optimized, perfectly centered right eye SVG
+module get_right_eye_2d(clearance = 0) {
+  offset(delta = clearance)
+    scale([0.20, 0.20])
+      mirror([0, 1]) // Fixes the upside-down SVG import
+        import("images/right_eye.svg");
+}
+
+// Generates a chip with a curved top and a deep, flat bottom
+module local_chip_geometry(clearance = 0, protrusion = 0, floor_z = -6) {
+  intersection() {
+    // 1. Extrude from a deep flat floor (-6mm) to well above the surface
+    // INCREASED HEIGHT from 5 to 20 to guarantee the massive eye clears the sphere curve
+    translate([0, 0, floor_z])
+      linear_extrude(height=abs(floor_z) + 20)
+        get_right_eye_2d(clearance);
+
+    // 2. Cut the top face using the exact curvature of the Pokéball.
+    translate([0, 0, -ball_radius])
+      sphere(r=ball_radius + protrusion);
   }
 }
 
-// Generates a deep 3D cylinder/cone from the mask shape
-module mask_cutter(expand) {
-  rotate([90, 0, 0])
-    translate([0, 0, -10]) // Starts slightly behind the core
-      linear_extrude(height=ball_radius + 20) // Pierces completely through the front
-        import_ghostface_svg(expand, mask_scale);
-}
+module draw_right_eye(is_pocket = true, hover = 0) {
+  clearance = is_pocket ? 0 : -chip_clearance;
 
-// Intersects the cutter with a spherical shell to create a curved pocket volume
-module pocket_volume(hover = 0) {
-  rotate([0, 0, 0]) // Pan
-    rotate([-35, 0, 0]) // Tilt 35 degrees up
-      intersection() {
-        mask_cutter(chip_clearance);
-        // Pocket gets the mechanical clearance!
-        difference() {
-          sphere(r=ball_radius + hover + eps);
-          sphere(r=ball_radius + hover - pocket_depth);
-        }
-      }
-}
+  // We force the pocket to be 6mm deep so the edges of the large eye don't get chopped off!
+  floor_z = -6;
+  protrusion = is_pocket ? eps : 0.5;
 
-// Intersects the cutter with a shell to create the positive physical chip
-module draw_ghostface_chip(hover = 0) {
-  rotate([0, 0, 0]) // Pan
-    rotate([-35, 0, 0]) // Tilt 35 degrees up
-      intersection() {
-        mask_cutter(0);
-        // Chip is true-to-size
-        difference() {
-          sphere(r=ball_radius + hover);
-          sphere(r=ball_radius + hover - pocket_depth);
-        }
-      }
+  // INCREASED TILT to 40 so it clears the Z=3 equator cut!
+  place_outward(20, 20, hover)
+    rotate([0, 0, 0])
+      local_chip_geometry(clearance, protrusion, floor_z);
 }
 
 // --- PRINTABLE CHIP LAYOUTS ---
 
 module layout_chips_black() {
-  // To print a curved shell, we orient the outer face pointing straight up (+Z)
-  // and drop the lowest inner point exactly onto the print bed (Z=0).
-  translate([0, 0, -(ball_radius - pocket_depth)])
-    rotate([-90, 0, 0]) // Points the face UP
-      intersection() {
-        mask_cutter(0);
-        difference() {
-          sphere(r=ball_radius);
-          sphere(r=ball_radius - pocket_depth);
-        }
-      }
+  // Move the flat bottom (which sits at Z = -6) up by 6mm so it prints perfectly flat on the bed!
+  translate([0, 0, 6])
+    local_chip_geometry(clearance = -chip_clearance, protrusion = 0.5, floor_z = -6);
 }
