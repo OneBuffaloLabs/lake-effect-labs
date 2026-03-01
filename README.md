@@ -3,6 +3,7 @@
 </p>
 
 # 1BfloPrints
+**[Shop Physical Prints on Etsy](https://1bfloprints.etsy.com)** | **[One Buffalo Labs](https://onebuffalolabs.com)**
 
 Welcome to **1BfloPrints**, the open-source 3D modeling playground of **[One Buffalo Labs](https://onebuffalolabs.com)**.
 
@@ -12,10 +13,11 @@ This repository is strictly a passion project area. It's the central hub for all
 
 ---
 
-## Where to Download & Print
+## Where to Download or Buy
 
-If you're just looking to download, slice, and get your printer running right away, you can find our pre-compiled, print-ready `.stl` and `.3mf` files on these platforms:
+If you're looking for the pre-compiled, print-ready `.stl` and `.3mf` files, or if you'd prefer to buy a finished physical print, you can find us here:
 
+- **Etsy (Physical Prints):** [1BfloPrints Shop](https://1bfloprints.etsy.com)
 - **MakerWorld:** [@1BfloPrints](https://makerworld.com/en/@Bana0615)
 - **Creality Cloud:** [@1BfloPrints](https://www.crealitycloud.com/user/2867011039)
 - **Printables:** [@1BfloPrints](https://www.printables.com/@1BfloPrints_4259106)
@@ -65,6 +67,8 @@ All models and code in this repository are released under the **Creative Commons
 - ✅ **Adapt:** You can remix, transform, and build upon the material.
 - ❌ **NonCommercial:** You may **not** use the material for commercial purposes (you cannot sell the digital files or physical prints).
 - 🔄 **ShareAlike:** If you remix, transform, or build upon the material, you must distribute your contributions under the exact same license as the original.
+
+**Want a physical version?** If you don't have a 3D printer and would like to purchase a high-quality physical print of one of these designs, visit our official storefront at **[1BfloPrints on Etsy](https://1bfloprints.etsy.com)**.
 
 _Note: If you are interested in commercial licensing for any of these designs, please reach out to us directly through [One Buffalo Labs](https://onebuffalolabs.com)._
 
