@@ -1,3 +1,38 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="722.35" height="1132.22" viewBox="0 0 722.35 1132.22">
-  <path id="nose" fill="#0f0e0e" d="M361.17,518.51S279.87,571.65,301.87,615.92s56.35,25.31,59.26-7.59c2.92,32.9,37.25,51.88,59.27,7.59S361.17,518.51,361.17,518.51Z"/>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="126.09148"
+   height="123.38956"
+   viewBox="0 0 126.09149 123.38957"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="nose.svg"
+   inkscape:version="1.4.2 (ebf0e94, 2025-05-08)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.71982479"
+     inkscape:cx="359.11517"
+     inkscape:cy="566.10999"
+     inkscape:window-width="1920"
+     inkscape:window-height="1065"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1" />
+  <path
+     id="nose"
+     fill="#0f0e0e"
+     d="m 63.076594,0 c 0,0 -81.3,53.14 -59.2999999,97.41 21.9999999,44.27 56.3499999,25.31 59.2599999,-7.59 2.92,32.9 37.249996,51.88 59.269996,7.59 C 144.32659,53.12 63.076594,0 63.076594,0 Z" />
 </svg>

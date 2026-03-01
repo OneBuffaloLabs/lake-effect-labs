@@ -1,3 +1,38 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="722.35" height="1132.22" viewBox="0 0 722.35 1132.22">
-  <path id="mouth" fill="#0f0e0e" d="M 361.18,691.87 A 98.39,188.6 0 1,0 361.18,1069.07 A 98.39,188.6 0 1,0 361.18,691.87 Z"/>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="196.78"
+   height="377.20001"
+   viewBox="0 0 196.78001 377.20002"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="mouth.svg"
+   inkscape:version="1.4.2 (ebf0e94, 2025-05-08)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.71982479"
+     inkscape:cx="361.19901"
+     inkscape:cy="566.10999"
+     inkscape:window-width="1920"
+     inkscape:window-height="1065"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1" />
+  <path
+     id="mouth"
+     fill="#0f0e0e"
+     d="m 98.389999,0 a 98.389999,188.6 0 1 0 0,377.2 98.389999,188.6 0 1 0 0,-377.2 z" />
 </svg>
