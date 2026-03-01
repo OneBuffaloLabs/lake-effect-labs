@@ -1,8 +1,8 @@
 /* GHOSTFACE (SCREAM) POKÉBALL */
 
 // --- PARAMETRIC VARIABLES ---
-part_to_render = "all"; // [all, top, bottom, ring, front_ring, button, filler, chips_black, debug_2d_right_eye, debug_2d_left_eye, debug_2d_nose]
-exploded_view = false;
+part_to_render = "all"; // [all, top, bottom, ring, front_ring, button, filler, chips_black, chips_white, debug_2d_right_eye, debug_2d_left_eye, debug_2d_nose]
+exploded_view = true;
 debug_transparent_chips = false;
 
 ball_radius = 40;
@@ -21,32 +21,41 @@ button_inner_radius = 7;
 front_pocket_depth = 6;
 
 // --- EYE TWEAKS & PLACEMENT ---
-right_eye_svg_x = -7;   // Shift the Right 2D SVG left/right
-right_eye_svg_y = 10;   // Shift the Right 2D SVG up/down
-left_eye_svg_x = -7;    // Shift the Left 2D SVG left/right
-left_eye_svg_y = 10;    // Shift the Left 2D SVG up/down
+right_eye_svg_x = -7;   
+right_eye_svg_y = 10;   
+left_eye_svg_x = -7;    
+left_eye_svg_y = 10;    
 
-eye_scale = 0.20;       // Scale of both SVGs
+eye_scale = 0.20;       
 
-eye_tilt = 45;          // Move up/down on the ball
-eye_pan = 30;           // Spread from center
-right_eye_rotation = 20; // Spin the right eye in place
-left_eye_rotation = -20;  // Spin the left eye in place
+eye_tilt = 45;          
+eye_pan = 30;           
+right_eye_rotation = 20; 
+left_eye_rotation = -20;  
 
-eye_pocket_depth = 3.5;   // Depth of the hole cut into the white shell
-eye_chip_thickness = 2.5; // Thickness of the printed chip
+eye_pocket_depth = 3.5;   
+eye_chip_thickness = 2.5; 
 
 // --- NOSE TWEAKS & PLACEMENT ---
-nose_svg_x = -4.5;         // Shift the Nose 2D SVG left/right
-nose_svg_y = 4.5;         // Shift the Nose 2D SVG up/down
-nose_scale = 0.20;      // Scale of the Nose SVG (May need to be smaller than the eyes!)
-nose_tilt = 25;         // Move up/down on the ball (Lower number = further down the face)
-nose_pan = 0;           // Keep at 0 to stay dead center!
-nose_rotation = 0;      // Spin the nose in place
+nose_svg_x = -4.5;      
+nose_svg_y = 4.5;       
+nose_scale = 0.20;      
+nose_tilt = 25;         
+nose_pan = 0;           
+nose_rotation = 0;      
 
-// 3. DEPTH & RECESS
-nose_pocket_depth = 3.5;   // Matches the eyes
-nose_chip_thickness = 2.5; // Matches the eyes
+nose_pocket_depth = 3.5;   
+nose_chip_thickness = 2.5; 
+
+// --- MOUTH TWEAKS & PLACEMENT ---
+mouth_width = 22.5;      // PROPORTIONAL SCALE: 75% of height
+mouth_height = 30;       // INCREASED BACK TO 30
+mouth_rounding = 3;      // How round the bottom point is (Higher = rounder!)
+mouth_tilt = -30;        // Tweak this (e.g. -25 or -20) if it needs to slide up to touch the ring!
+mouth_pan = 0;           // Keep dead center
+
+mouth_pocket_depth = 3.5;   
+mouth_chip_thickness = 2.5; 
 
 // --- TOLERANCES & CLEARANCES ---
 mechanical_clearance = 0.05;
@@ -66,10 +75,12 @@ ring_color = "black";
 front_ring_color = "black";
 button_color = "red";
 filler_color = "black";
+mouth_color = "white";
 
 // --- RENDER LOGIC ---
 
 c_black = debug_transparent_chips ? [0, 0, 0, 0.5] : "black";
+c_white = debug_transparent_chips ? [1, 1, 1, 0.5] : mouth_color;
 
 if (part_to_render == "debug_2d_right_eye") {
   color("red") cube([100, 0.5, 0.1], center=true); 
@@ -85,6 +96,8 @@ if (part_to_render == "debug_2d_right_eye") {
   color("black") linear_extrude(1) get_nose_2d();
 } else if (part_to_render == "chips_black") { 
   color("black") layout_chips_black(); 
+} else if (part_to_render == "chips_white") { 
+  color(mouth_color) layout_chips_white(); 
 } else if (part_to_render == "all") {
   if (exploded_view == true) {
     // --- EXPANDED VIEW ---
@@ -99,6 +112,9 @@ if (part_to_render == "debug_2d_right_eye") {
       color(c_black) draw_eyes(is_pocket=false, hover=15);
       color(c_black) draw_nose(is_pocket=false, hover=15);
     }
+    translate([0, 0, -35]) {
+      color(c_white) draw_mouth(is_pocket=false, hover=15);
+    }
   } else {
     // --- NORMAL ASSEMBLED VIEW ---
     translate([0, 0, 0.02]) color(top_color) top_mask();
@@ -111,6 +127,9 @@ if (part_to_render == "debug_2d_right_eye") {
     translate([0, 0, 0.02]) {
       color(c_black) draw_eyes(is_pocket=false, hover=0);
       color(c_black) draw_nose(is_pocket=false, hover=0);
+    }
+    translate([0, 0, -0.02]) {
+      color(c_white) draw_mouth(is_pocket=false, hover=0);
     }
   }
 } else {
@@ -160,6 +179,9 @@ module bottom_shell() {
     translate([0, -ball_radius + front_pocket_depth, 0])
       rotate([90, 0, 0])
         cylinder(r=front_ring_outer_r + mechanical_clearance, h=front_pocket_depth + eps * 2, center=false);
+
+    // CUT THE MOUTH POCKET!
+    draw_mouth(is_pocket=true);
   }
 }
 
@@ -238,14 +260,12 @@ module draw_eyes(is_pocket = true, hover = 0) {
   z_off = is_pocket ? -eps : recess_depth;
   h_val = is_pocket ? eye_pocket_depth + eps : eye_chip_thickness;
 
-  // Draw Right Eye (+pan)
   place_outward(eye_tilt, eye_pan, hover)
     rotate([0, 0, right_eye_rotation])
       translate([0, 0, z_off])
         linear_extrude(height=h_val)
           get_right_eye_2d(clearance);
 
-  // Draw Left Eye (-pan)
   place_outward(eye_tilt, -eye_pan, hover)
     rotate([0, 0, left_eye_rotation])
       translate([0, 0, z_off])
@@ -266,21 +286,55 @@ module draw_nose(is_pocket = true, hover = 0) {
           get_nose_2d(clearance);
 }
 
+module draw_mouth(is_pocket = true, hover = 0) {
+  clearance = is_pocket ? 0 : -chip_clearance;
+  recess_depth = mouth_pocket_depth - mouth_chip_thickness;
+  z_off = is_pocket ? -eps : recess_depth;
+  h_val = is_pocket ? mouth_pocket_depth + eps : mouth_chip_thickness;
+
+  difference() {
+    place_outward(mouth_tilt, mouth_pan, hover)
+      translate([0, 0, z_off])
+        linear_extrude(height=h_val)
+          offset(delta = clearance) // Keeps the snap-fit clearance intact
+            offset(r = mouth_rounding) // Rounds the corners outward
+              offset(delta = -mouth_rounding) // Shrinks back to original size, leaving corners rounded!
+                polygon([ [-mouth_width/2, -mouth_height/2], [mouth_width/2, -mouth_height/2], [0, mouth_height/2] ]);
+
+    // Bite out the top using the exact dimensions of the front ring!
+    ring_cut_r = is_pocket ? front_ring_outer_r : front_ring_outer_r + mechanical_clearance;
+    translate([0, -ball_radius, 0])
+      rotate([90, 0, 0])
+        cylinder(r=ring_cut_r, h=100, center=true);
+
+    // Failsafe to protect the center ring equator (Z = -3 cut)
+    translate([0, 0, 50 - 3])
+      cube([100, 100, 100], center=true);
+  }
+}
+
 // --- PRINTABLE CHIP LAYOUTS ---
 
 module layout_chips_black() {
-  // Right Eye
   translate([15, 0, 0])
     linear_extrude(height=eye_chip_thickness)
       get_right_eye_2d(-chip_clearance);
 
-  // Left Eye
   translate([-15, 0, 0])
     linear_extrude(height=eye_chip_thickness)
       get_left_eye_2d(-chip_clearance);
 
-  // Nose
   translate([0, 20, 0])
     linear_extrude(height=nose_chip_thickness)
       get_nose_2d(-chip_clearance);
+}
+
+module layout_chips_white() {
+  // To print the white mouth, we mathematically "un-roll" the subtracted shape
+  // so it drops directly flat on your print bed, cutout included!
+  rotate([90, 0, 0])
+    translate([0, ball_radius, 0])
+      rotate([mouth_tilt, 0, 0])
+        rotate([0, 0, -mouth_pan])
+          draw_mouth(is_pocket=false, hover=0);
 }
